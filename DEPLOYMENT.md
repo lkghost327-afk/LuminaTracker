@@ -46,7 +46,7 @@ Set these environment variables on the server:
 | `NODE_ENV=production` | Reject callers outside the configured extension IDs. |
 | `ALLOWED_EXTENSION_IDS` | Comma-separated Chrome/Edge extension IDs; obtain a development ID from the browser Extensions page. Add each store-assigned ID before distribution. |
 | `PUBLISHER_NAME` | Your actual publisher name, shown in the public privacy page. |
-| `SUPPORT_EMAIL` | Your actual support/privacy contact. |
+| `SUPPORT_URL` or `SUPPORT_EMAIL` | Your actual HTTPS support page or email. When both are set, the URL is used. |
 | `SERPAPI_KEY` | Optional server-only Google Shopping provider key for wider retailer coverage. Without it the service uses direct retailer adapters. |
 | `DAILY_SEARCH_LIMIT` | Default 100 accepted comparisons per UTC day, per running server process. |
 | `SEARCHES_PER_MINUTE` | Default 12 comparisons per client IP per minute. |
@@ -69,7 +69,7 @@ npm run extension:build -- --api-url https://YOUR-ACTUAL-SERVICE-HOST
 
 This creates `release/standalone-extension/` and `release/LuminaTracker-standalone-extension.zip`. The backend address is built in; users do not enter an API address or provider key. Production builds reject localhost and placeholder service domains. Developer builds are separately named and packaged.
 
-Set `PUBLISHER_NAME`, `SUPPORT_EMAIL`, and `LUMINA_API_URL` in your build environment, then run:
+Set `PUBLISHER_NAME`, either `SUPPORT_URL` or `SUPPORT_EMAIL`, and `LUMINA_API_URL` in your build environment, then run:
 
 ```sh
 npm run extension:store

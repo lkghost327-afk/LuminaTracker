@@ -37,7 +37,7 @@ The intended uses are the single-purpose comparison feature and service abuse pr
 
 **Privacy URL:** your deployed service's `/privacy` page, with actual publisher and contact details.
 
-**Support:** your actual support email and a working public support URL if required by the store. No invented addresses should be submitted.
+**Support:** your actual support email or HTTPS support page and a working public support URL if required by the store. No invented addresses should be submitted.
 
 ## Reviewer instructions
 

@@ -12,7 +12,7 @@ services:
         sync: false
       - key: PUBLISHER_NAME
         sync: false
-      - key: SUPPORT_EMAIL
+      - key: SUPPORT_URL
         sync: false
       - key: DAILY_SEARCH_LIMIT
         value: "100"

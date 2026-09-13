@@ -13,7 +13,7 @@ const development = args.includes('--dev');
 const store = args.includes('--store');
 const apiInput = argument('--api-url') || process.env.LUMINA_API_URL || '';
 const publisher = process.env.PUBLISHER_NAME || '';
-const email = process.env.SUPPORT_EMAIL || '';
+const email = process.env.SUPPORT_URL || process.env.SUPPORT_EMAIL || '';
 let apiBase = '';
 if (apiInput) {
   const url = new URL(apiInput);
@@ -22,13 +22,14 @@ if (apiInput) {
   apiBase = url.origin;
 }
 if (store) {
-  if (development || !apiBase || !publisher.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw Error('Store packaging requires a production API URL, PUBLISHER_NAME and SUPPORT_EMAIL.');
+  const validContact = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || (() => { try { const url = new URL(email); return url.protocol === 'https:' && !url.username && !url.password; } catch { return false; } })();
+  if (development || !apiBase || !publisher.trim() || !validContact) throw Error('Store packaging requires a production API URL, PUBLISHER_NAME and SUPPORT_URL or SUPPORT_EMAIL.');
   const response = await fetch(apiBase + '/health', { signal: AbortSignal.timeout(10000), redirect: 'error' });
   const health = await response.json();
   if (!response.ok || health.app !== 'LuminaTracker API' || !health.configured) throw Error('The online service is not ready for store submission.');
   const policy = await fetch(apiBase + '/privacy', { signal: AbortSignal.timeout(10000), redirect: 'error' });
   const html = await policy.text();
-  if (!policy.ok || !html.includes(email)) throw Error('The deployed privacy page does not match SUPPORT_EMAIL.');
+  if (!policy.ok || !html.includes(email.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])))) throw Error('The deployed privacy page does not match the support contact.');
 }
 const outName = development ? 'standalone-extension-dev' : 'standalone-extension';
 const out = path.join(root, 'release', outName);

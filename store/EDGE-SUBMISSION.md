@@ -29,7 +29,7 @@ The preview ZIP intentionally shows Service setup pending. It must not be submit
 | Remote code | No. Executable code is bundled; the service returns JSON price data. |
 | Data usage | Disclose shopping-page content/activity, product queries and country/IP handling, including local processing. |
 | Privacy URL | The deployed HTTPS API's `/privacy` page with actual publisher/contact details. |
-| Support | Publisher-approved support email or support page. |
+| Support | Publisher-approved support email or HTTPS support page. |
 | Screenshots | Capture the real configured extension. Do not submit test-fixture prices as production results. |
 | Markets | Start with countries whose live sources have actually been validated. |
 | Reviewer notes | Use the test steps in `STORE-LISTING.md` with a query verified against the live provider. |
@@ -39,7 +39,7 @@ The preview ZIP intentionally shows Service setup pending. It must not be submit
 1. Sign in to Microsoft Partner Center with the publisher's Microsoft account and enroll in the Edge program if needed. The account owner supplies identity/contact information and reviews the developer agreement.
 2. Deploy the API from the GitHub repository using `render.yaml` or `server/Dockerfile`. See `DEPLOYMENT.md`. No paid service should be purchased without a chosen budget.
 3. Build a configured ZIP and create a draft Edge extension. Add its assigned extension ID to `ALLOWED_EXTENSION_IDS` on the API. Replace any temporary development IDs before release.
-4. Set actual `PUBLISHER_NAME`, `SUPPORT_EMAIL`, and `LUMINA_API_URL`; run `npm run extension:store`. The build checks the live health and privacy endpoints.
+4. Set actual `PUBLISHER_NAME`, `SUPPORT_EMAIL (or SUPPORT_URL)`, and `LUMINA_API_URL`; run `npm run extension:store`. The build checks the live health and privacy endpoints.
 5. Upload the final ZIP, complete the fields above, verify the live user flow, and submit for certification when the service and listing are ready.
 
 Official references: [free Edge registration](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/create-dev-account), [publish an Edge extension](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension).
