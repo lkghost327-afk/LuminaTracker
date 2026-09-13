@@ -9,7 +9,10 @@ The chosen publishing target is Microsoft Edge Add-ons. Chrome Web Store publica
 - Listing text and permission/data disclosures: `STORE-LISTING.md`.
 - ZIP generation and deployment files are available.
 - Public API hosting, working production price coverage, actual publisher/contact information and public privacy URL remain unconfigured.
-- Microsoft Partner Center sign-in/enrollment is required before creating the store draft.
+- GitHub source repository is public: https://github.com/lkghost327-afk/LuminaTracker
+- Microsoft Partner Center enrollment is complete; the Individual developer account shows Authorized (checked 2026-09-13).
+- Edge draft created: `4484bbc2-184b-4249-81ef-f782c5cc6c0c`. Package upload remains incomplete: Partner Center returned a generic upload error with both generated and standard ZIP archives.
+- Draft dashboard: https://partner.microsoft.com/en-us/dashboard/microsoftedge/4484bbc2-184b-4249-81ef-f782c5cc6c0c/packages
 - No package has been submitted for certification.
 
 The preview ZIP intentionally shows Service setup pending. It must not be submitted as a working public extension. Draft preparation can continue before certification.
@@ -40,3 +43,7 @@ The preview ZIP intentionally shows Service setup pending. It must not be submit
 5. Upload the final ZIP, complete the fields above, verify the live user flow, and submit for certification when the service and listing are ready.
 
 Official references: [free Edge registration](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/create-dev-account), [publish an Edge extension](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension).
+
+## Upload troubleshooting (2026-09-13)
+
+Partner Center returned 'Something went wrong. Please try again.' during package uploads. The latest correlation ID is c254417f-0d31-4044-9f23-4a5f40537d55. No package validation report was returned. A standard Windows ZIP containing the same explicit runtime files also failed; this does not establish a package-format defect. Preserve the existing draft and retry the final configured package after the portal issue is resolved.
