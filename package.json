@@ -1,0 +1,60 @@
+{
+  "name": "luminatracker",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "LuminaTracker — Universal Deal Finder & Price Analyzer. Privacy-first, runs locally on your machine.",
+  "main": "electron/main.cjs",
+  "private": true,
+  "scripts": {
+    "test": "npm run extension:build && node --test tests/*.test.cjs",
+    "api:start": "node server/index.cjs",
+    "extension:build": "node scripts/build-extension.mjs",
+    "extension:dev": "node scripts/build-extension.mjs --dev --api-url http://127.0.0.1:8787",
+    "extension:store": "node scripts/build-extension.mjs --store",
+    "test:extension-browser": "node scripts/smoke-extension-browser.cjs",
+    "test:live": "node scripts/check-live.cjs",
+    "test:desktop": "npm run build && electron scripts/smoke-electron.cjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"cross-env BROWSER=none vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run extension:build && vite build && electron-builder",
+    "electron:start": "electron ."
+  },
+  "build": {
+    "extraResources": [{ "from": "release/standalone-extension", "to": "browser-extension" }],
+    "appId": "com.luminatracker.app",
+    "productName": "LuminaTracker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "shared/**/*",
+      "public/icon.png"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    }
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^42.0.1",
+    "electron-builder": "^26.8.1",
+    "vite": "^8.0.10",
+    "wait-on": "^9.0.5"
+  },
+  "dependencies": {
+    "axios": "^1.16.0",
+    "cheerio": "^1.2.0",
+    "country-to-currency": "^2.0.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-is": "^19.2.6",
+    "recharts": "^3.8.1"
+  }
+}

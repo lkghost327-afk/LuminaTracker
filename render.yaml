@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: luminatracker-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_EXTENSION_IDS
+        sync: false
+      - key: PUBLISHER_NAME
+        sync: false
+      - key: SUPPORT_EMAIL
+        sync: false
+      - key: DAILY_SEARCH_LIMIT
+        value: "100"
+      - key: TRUST_PROXY_HOPS
+        value: "1"

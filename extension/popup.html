@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LuminaTracker</title><link rel="stylesheet" href="popup.css"></head>
+<body><header><img src="icon.png" width="32" height="32" alt=""><div><h1>LuminaTracker</h1><p>Better offers, right here.</p></div><span class="badge">Standalone</span></header>
+  <section id="setup" hidden class="notice"><h2>Service setup pending</h2><p>This preview needs the publisher’s online deal service before it can retrieve offers.</p></section>
+  <section id="consent"><h2>Compare without leaving your browser</h2><p>Product names and your country are sent to the online deal service and its shopping sources. Page URLs and current prices stay in your browser.</p><button id="enable">Enable comparisons</button></section>
+  <form id="search-form"><label for="query">Product or model</label><input id="query" maxlength="200" placeholder="Open a product page or type a model" required><button id="compare">Find other-store offers</button></form>
+  <p id="page-note" class="muted"></p><p id="region" class="region"></p>
+  <details id="preferences"><summary>Region & preferences</summary>
+    <label for="country">Shopping country</label><select id="country"><option value="auto">Automatic — device region</option></select>
+    <label class="toggle"><input id="ip-detection" type="checkbox">Improve country detection using my IP</label><p class="muted">Optional: contacts ipapi.co. A VPN may affect the estimate.</p>
+    <label class="toggle"><input id="automatic" type="checkbox">Show offers automatically on shopping sites</label><p class="muted">Only after you allow site access. Product names and shopping searches on permitted stores are sent to the deal service. Reload existing shopping tabs after enabling.</p>
+    <button id="disable" class="secondary">Disable comparisons</button><button id="reset" class="secondary">Reset preferences</button>
+  </details>
+  <p id="status" role="status"></p><section id="results" aria-label="Comparison results"></section>
+  <footer><p class="muted">No desktop app required. Confirm model, condition and final checkout charges.</p><a id="privacy" href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy & data use</a></footer>
+  <script src="page-info.js"></script><script src="popup.js"></script>
+</body></html>

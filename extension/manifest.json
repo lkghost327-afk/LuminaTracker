@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "LuminaTracker — Compare Shopping Offers",
+  "version": "2.0.0",
+  "description": "Find regional shopping offers while you browse. Standalone price comparisons with no desktop app required.",
+  "minimum_chrome_version": "120",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [],
+  "optional_host_permissions": [
+    "https://*.amazon.in/*",
+    "https://*.amazon.com/*",
+    "https://*.amazon.co.uk/*",
+    "https://*.amazon.ca/*",
+    "https://*.amazon.com.au/*",
+    "https://*.amazon.de/*",
+    "https://*.amazon.fr/*",
+    "https://*.amazon.it/*",
+    "https://*.amazon.es/*",
+    "https://*.amazon.co.jp/*",
+    "https://*.amazon.com.br/*",
+    "https://*.amazon.com.mx/*",
+    "https://*.amazon.nl/*",
+    "https://*.amazon.se/*",
+    "https://*.amazon.pl/*",
+    "https://*.amazon.sg/*",
+    "https://*.amazon.ae/*",
+    "https://*.amazon.sa/*",
+    "https://*.flipkart.com/*",
+    "https://*.meesho.com/*",
+    "https://*.ebay.com/*",
+    "https://*.ebay.co.uk/*",
+    "https://*.ebay.ca/*",
+    "https://*.ebay.com.au/*",
+    "https://*.ebay.de/*",
+    "https://*.ebay.fr/*",
+    "https://*.ebay.it/*",
+    "https://*.ebay.es/*",
+    "https://*.walmart.com/*",
+    "https://*.bestbuy.com/*",
+    "https://ipapi.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Compare with LuminaTracker",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://ipapi.co;"
+  }
+}

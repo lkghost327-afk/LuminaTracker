@@ -1,0 +1,13 @@
+**
+!package.json
+!package-lock.json
+!shared/
+!shared/**
+!electron/
+!electron/scraper/
+!electron/scraper/**
+!server/
+!server/**
+server/.env
+server/.env.*
+!server/.env.example
