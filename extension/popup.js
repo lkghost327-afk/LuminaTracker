@@ -60,7 +60,7 @@ element('automatic').addEventListener('change', action(async () => {
   await preferences({ automatic: enabled }); status(enabled ? 'Automatic comparisons enabled. Reload existing shopping tabs.' : 'Automatic comparisons disabled.');
 }));
 element('search-form').addEventListener('submit', async event => {
-  event.preventDefault(); element('compare').disabled = true; element('results').replaceChildren(); status('Checking stores in your region…');
+  event.preventDefault(); element('compare').disabled = true; element('results').replaceChildren(); status('Checking stores in your region… Some searches can take up to two minutes.');
   const generation = ++searchGeneration;
   try { const query = element('query').value.trim(); const result = await send({ type: 'compare', query, current: query === page?.query ? page.current : {} }); if (generation === searchGeneration) { render(result); status(''); } }
   catch (error) { if (generation === searchGeneration) status(error.message); }

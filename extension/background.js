@@ -57,12 +57,26 @@ async function search(query, market) {
   if (previous && Date.now() - previous.time < 120000) return { ...previous.result, cached: true };
   if (pending.has(key)) return pending.get(key);
   const task = (async () => {
-    let response;
-    try {
-      response = await fetch(LUMINA_CONFIG.apiBase + '/v1/search', { method: 'POST', credentials: 'omit', redirect: 'error',
-        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, country: market.country }), signal: AbortSignal.timeout(25000) });
-    } catch { throw Error('The online deal service is unavailable. Please try again shortly.'); }
-    const body = await readJSON(response);
+    let response, body, jobId, networkFailures = 0;
+    const deadline = Date.now() + 180000;
+    while (Date.now() < deadline) {
+      const prefs = await settings();
+      if (!prefs.enabled || generation !== preferenceGeneration) throw Error('Preferences changed. Compare again using your current settings.');
+      try {
+        response = await fetch(LUMINA_CONFIG.apiBase + '/v1/search' + (jobId ? '/' + jobId : ''), {
+          method: jobId ? 'GET' : 'POST', credentials: 'omit', redirect: 'error',
+          ...(jobId ? {} : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, country: market.country }) }), signal: AbortSignal.timeout(25000) });
+        body = await readJSON(response);
+      } catch {
+        if (++networkFailures >= 3) throw Error('The online deal service is unavailable. Please try again shortly.');
+        await new Promise(resolve => setTimeout(resolve, 2000)); continue;
+      }
+      if (response.status !== 202) break;
+      if (!body.pending || typeof body.jobId !== 'string' || !/^[a-f0-9-]{36}$/.test(body.jobId) || jobId && body.jobId !== jobId) throw Error('The deal service returned an invalid comparison status.');
+      jobId = body.jobId;
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+    if (!response || response.status === 202) throw Error('This comparison took too long. Please try again shortly.');
     if (!response.ok) throw Error(typeof body.error === 'string' ? body.error.slice(0, 300) : 'The deal service could not complete this comparison.');
     if (!Array.isArray(body.data) || body.market?.country !== market.country || body.market?.currency !== market.currency || !Number.isFinite(Date.parse(body.checkedAt))) throw Error('The deal service returned an invalid region or price response.');
     const products = body.data.slice(0, 60).filter(p => p && typeof p.title === 'string' && typeof p.price === 'number').map(p => LuminaCore.normalizeProduct({

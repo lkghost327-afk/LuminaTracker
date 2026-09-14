@@ -12,7 +12,7 @@ function providerProducts(body, market) {
     catalogId: p.product_id, condition: p.second_hand_condition ? 'used' : undefined,
   }));
 }
-function createSearchEngine({ fetchPage = request, timeoutMs = 20000, cacheMs = 120000, now = () => Date.now() } = {}) {
+function createSearchEngine({ fetchPage = request, timeoutMs = 20000, providerTimeoutMs = 100000, cacheMs = 120000, now = () => Date.now() } = {}) {
   const cache = new Map();
   const pending = new Map();
   let active = 0;
@@ -44,20 +44,21 @@ function createSearchEngine({ fetchPage = request, timeoutMs = 20000, cacheMs = 
         const status = { id: source.id, name: source.name, status: 'empty', count: 0, checkedAt,
           url: source.id === 'shopping' ? `https://www.google.com/search?tbm=shop&gl=${country.toLowerCase()}&q=${encodeURIComponent(query)}` : searchUrl(source, query) };
         const controller = new AbortController();
+        const sourceTimeout = source.id === 'shopping' ? providerTimeoutMs : timeoutMs;
         let timer;
         try {
           const work = async () => {
             if (source.id === 'shopping') {
               const url = new URL('https://serpapi.com/search.json');
-              Object.entries({ engine: 'google_shopping', q: query, gl: country.toLowerCase(), hl: 'en', api_key: apiKey, ...(refresh ? { no_cache: 'true' } : {}) }).forEach(([k, v]) => url.searchParams.set(k, v));
-              const body = await fetchPage(url.href, { signal: controller.signal, json: true });
-              if (body.error) throw Object.assign(new Error('Shopping provider rejected the request. Check your API key and quota in Settings.'), { code: 'provider_error' });
+              Object.entries({ engine: 'google_shopping_light', q: query, gl: country.toLowerCase(), hl: 'en', api_key: apiKey, ...(refresh ? { no_cache: 'true' } : {}) }).forEach(([k, v]) => url.searchParams.set(k, v));
+              const body = await fetchPage(url.href, { signal: controller.signal, json: true, timeoutMs: sourceTimeout });
+              if (body.error) throw Object.assign(new Error('The shopping provider could not complete this search. Please try again later.'), { code: 'provider_error' });
               return providerProducts(body, market);
             }
             return parsePage(await fetchPage(status.url, { signal: controller.signal }), market, source);
           };
           const raw = await Promise.race([work(), new Promise((_, reject) => {
-            timer = setTimeout(() => { controller.abort(); reject(Object.assign(new Error('Store timed out. Try again later.'), { code: 'timeout' })); }, timeoutMs);
+            timer = setTimeout(() => { controller.abort(); reject(Object.assign(new Error('This price source took too long. Please try again later.'), { code: 'timeout' })); }, sourceTimeout);
           })]);
           const valid = raw.map(p => normalizeProduct(p, market, source, checkedAt)).filter(Boolean);
           const ranked = rankProducts(valid, query);
@@ -66,6 +67,7 @@ function createSearchEngine({ fetchPage = request, timeoutMs = 20000, cacheMs = 
           status.status = ranked.length ? 'ok' : 'empty';
           status.message = ranked.length ? `${ranked.length} relevant listings retrieved` : 'No usable matching listings. The page may require JavaScript or its layout may have changed.';
         } catch (error) {
+          if (controller.signal.aborted || ['ERR_CANCELED', 'ECONNABORTED', 'ETIMEDOUT'].includes(error.code) || ['AbortError', 'TimeoutError'].includes(error.name)) error = { code: 'timeout', message: 'This price source took too long. Please try again later.' };
           status.status = ['blocked', 'timeout', 'provider_error', 'unavailable'].includes(error.code) ? error.code : 'error';
           status.message = status.status === 'error' ? 'Could not connect to this source. Check your connection and try again.' : error.message;
         } finally { clearTimeout(timer); }

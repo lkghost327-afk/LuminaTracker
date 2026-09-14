@@ -1,8 +1,8 @@
 const axios = require('axios');
 let customFetch;
 function setFetch(fetcher) { customFetch = fetcher; }
-async function request(url, { signal, json = false } = {}) {
-  const abort = AbortSignal.any([AbortSignal.timeout(18000), ...(signal ? [signal] : [])]);
+async function request(url, { signal, json = false, timeoutMs = 18000 } = {}) {
+  const abort = AbortSignal.any([AbortSignal.timeout(timeoutMs), ...(signal ? [signal] : [])]);
   let body;
   let status;
   if (customFetch) {
@@ -10,7 +10,7 @@ async function request(url, { signal, json = false } = {}) {
     status = response.status;
     if (response.ok) body = json ? await response.json() : await response.text();
   } else {
-    const response = await axios.get(url, { signal: abort, timeout: 18000, maxContentLength: 12 * 1024 * 1024,
+    const response = await axios.get(url, { signal: abort, timeout: timeoutMs, maxContentLength: 12 * 1024 * 1024,
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 'Accept-Language': 'en-US,en;q=0.9' },
       validateStatus: () => true, responseType: json ? 'json' : 'text' });
     status = response.status; body = response.data;

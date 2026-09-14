@@ -97,6 +97,19 @@ test('shopping provider retains native currency, source and comparison-page prov
   const p = providerProducts({ shopping_results: [{ title: 'Sony WH-1000XM5', price: '₹24,990', extracted_price: 24990, source: 'Croma', product_link: 'https://www.google.com/search?ibp=oshop', delivery: 'Free delivery' }] }, marketFor('IN'))[0];
   assert.equal(p.currency, 'INR'); assert.equal(p.shipping, 0); assert.equal(p.linkType, 'comparison'); assert.equal(p.platform, 'Croma');
 });
+
+test('shopping searches allow provider latency and sanitize upstream timeouts and errors', async () => {
+  const engine = createSearchEngine({ timeoutMs: 5, providerTimeoutMs: 100, fetchPage: async (url, options) => {
+    assert.equal(new URL(url).searchParams.get('engine'), 'google_shopping_light');
+    assert.equal(options.timeoutMs, 100);
+    await new Promise(resolve => setTimeout(resolve, 15));
+    return { shopping_results: [{ title: 'Sony WH-1000XM5', price: '₹24,990', source: 'Croma', product_link: 'https://www.google.com/shopping/product/123' }] };
+  } });
+  assert.equal((await engine.search('Sony WH-1000XM5', { country: 'IN', apiKey: 'test-only' })).data.length, 1);
+  const failed = createSearchEngine({ fetchPage: async () => { throw Object.assign(new Error('private api_key=secret'), { code: 'ERR_CANCELED' }); } });
+  const result = await failed.search('Sony', { country: 'IN', apiKey: 'test-only' });
+  assert.equal(result.sources[0].status, 'timeout'); assert.ok(!JSON.stringify(result).includes('secret'));
+});
 test('partial failures preserve successes, deduplicate concurrent requests and stream progress', async () => {
   let calls = 0;
   const fixture = '<div data-component-type="s-search-result"><h2><a href="/dp/B09XS7JWHH">Sony WH-1000XM5</a></h2><span class="a-price"><span class="a-offscreen">₹24,990.99</span></span></div>';

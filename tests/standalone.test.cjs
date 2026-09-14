@@ -58,6 +58,59 @@ test('cloud quotas stop excess provider calls and reset on the next UTC day', as
     time += 86400000; assert.equal((await post()).status, 200); assert.equal(service.calls.length, 2);
   } finally { await service.close(); }
 });
+
+test('slow comparisons are polled without repeating provider searches or consuming extra quota', async () => {
+  let finish, calls = 0, time = Date.now();
+  const service = await api({ responseWaitMs: 5, dailyLimit: 1, now: () => time,
+    engine: { search: () => { calls++; return new Promise(resolve => { finish = () => resolve(fixture('IN')); }); } } });
+  try {
+    const response = await fetch(service.base + '/v1/search', { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify({ query: 'Sony', country: 'IN' }) });
+    assert.equal(response.status, 202);
+    const job = await response.json();
+    assert.equal(job.pending, true); assert.ok(!JSON.stringify(job).includes('Sony'));
+    const url = service.base + '/v1/search/' + job.jobId;
+    assert.equal((await fetch(url, { headers: { Origin: origin } })).status, 202);
+    assert.equal((await fetch(url, { headers: { Origin: 'chrome-extension://' + 'c'.repeat(32) } })).status, 403);
+    finish();
+    const result = await fetch(url, { headers: { Origin: origin } });
+    assert.equal(result.status, 200); assert.equal((await result.json()).data.length, 1); assert.equal(calls, 1);
+    time += 180001;
+    assert.equal((await fetch(url, { headers: { Origin: origin } })).status, 404);
+  } finally { finish?.(); await service.close(); }
+});
+
+test('standalone worker follows pending comparisons and tolerates a cold-start connection failure', async () => {
+  const jobId = '12345678-1234-1234-1234-123456789abc';
+  let calls = 0;
+  const ext = worker('https://api.example.test', { fetcher: async () => {
+    calls++;
+    if (calls === 1) throw Error('cold start');
+    if (calls === 2) return Response.json({ pending: true, jobId }, { status: 202 });
+    return Response.json(fixture('IN'));
+  } });
+  await ext.send({ type: 'preferences', values: { enabled: true, country: 'IN' } });
+  const response = await ext.send({ type: 'compare', query: 'Sony WH-1000XM5' });
+  assert.equal(response.result.offers.length, 1);
+  assert.equal(ext.requests[2].options.method, 'GET');
+  assert.equal(ext.requests[2].url, 'https://api.example.test/v1/search/' + jobId);
+  assert.equal(ext.requests[2].options.body, undefined);
+});
+
+test('standalone worker rejects foreign polling URLs and stops polling when consent changes', async () => {
+  const ext = worker('https://api.example.test', { fetcher: async () => Response.json({ pending: true, jobId: 'https://evil.test/steal' }, { status: 202 }) });
+  await ext.send({ type: 'preferences', values: { enabled: true, country: 'IN' } });
+  assert.match((await ext.send({ type: 'compare', query: 'Sony' })).error, /invalid comparison status/);
+  assert.equal(ext.requests.length, 1);
+  let started;
+  const waiting = new Promise(resolve => { started = resolve; });
+  const cancellable = worker('https://api.example.test', { fetcher: async () => { started(); return Response.json({ pending: true, jobId: '12345678-1234-1234-1234-123456789abc' }, { status: 202 }); } });
+  await cancellable.send({ type: 'preferences', values: { enabled: true, country: 'IN' } });
+  const comparison = cancellable.send({ type: 'compare', query: 'Sony' });
+  await waiting;
+  await cancellable.send({ type: 'preferences', values: { enabled: false } });
+  assert.match((await comparison).error, /Preferences changed/);
+  assert.equal(cancellable.requests.length, 1);
+});
 test('cloud failure messages never expose upstream secrets and privacy needs publisher information', async () => {
   const service = await api({ supportEmail: '', engine: { search: async () => { throw Error('https://upstream.test?api_key=secret'); } } });
   try {
