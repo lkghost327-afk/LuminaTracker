@@ -31,13 +31,15 @@ if (store) {
   const html = await policy.text();
   if (!policy.ok || !html.includes(email.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])))) throw Error('The deployed privacy page does not match the support contact.');
 }
-const outName = development ? 'standalone-extension-dev' : 'standalone-extension';
+const outName = development ? 'standalone-extension-dev' : store ? 'edge-store-extension' : 'standalone-extension';
 const out = path.join(root, 'release', outName);
 await fs.mkdir(out, { recursive: true });
 const manifest = JSON.parse((await fs.readFile(path.join(root, 'extension/manifest.json'), 'utf8')).replace(/^\uFEFF/, ''));
 manifest.host_permissions = apiBase ? [apiBase + '/*'] : [];
 manifest.content_security_policy.extension_pages = "script-src 'self'; object-src 'none'; connect-src https://ipapi.co" + (apiBase ? ' ' + apiBase : '') + ';';
-if (development) manifest.name += ' (Development)';
+if (development) { manifest.name += ' (Development)'; delete manifest.key; }
+// Edge assigns the signing identity itself and rejects key in submitted manifests.
+if (store) delete manifest.key;
 await fs.writeFile(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 2));
 const config = { apiBase, privacyUrl: apiBase ? apiBase + '/privacy' : '', development };
 await fs.writeFile(path.join(out, 'config.js'), 'const LUMINA_CONFIG = Object.freeze(' + JSON.stringify(config) + ');\n');

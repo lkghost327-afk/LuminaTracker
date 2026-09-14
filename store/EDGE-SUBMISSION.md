@@ -8,14 +8,18 @@ The chosen publishing target is Microsoft Edge Add-ons. Chrome Web Store publica
 - Automated tests and an actual Edge extension test pass.
 - Listing text and permission/data disclosures: `STORE-LISTING.md`.
 - ZIP generation and deployment files are available.
-- Public API hosting, working production price coverage, actual publisher/contact information and public privacy URL remain unconfigured.
+- Preview API deployed: https://luminatracker-api.onrender.com (Render free Docker service, Singapore). Health and privacy verified 2026-09-14.
+- Approved publisher: Ashuuuu. Support: https://github.com/lkghost327-afk/LuminaTracker/issues. Privacy: https://luminatracker-api.onrender.com/privacy.
+- CRX ID `gpebgbfjehhfoincaggfbhcbplfcjgbi` is configured on the API; Store ID `0RDCKG4WJJPK`.
+- Live India and US tests returned zero offers. India: Amazon, Flipkart and Meesho blocked direct access from the server. A shopping-data provider remains unconfigured.
 - GitHub source repository is public: https://github.com/lkghost327-afk/LuminaTracker
 - Microsoft Partner Center enrollment is complete; the Individual developer account shows Authorized (checked 2026-09-13).
-- Edge draft created: `4484bbc2-184b-4249-81ef-f782c5cc6c0c`. Package upload remains incomplete: Partner Center returned a generic upload error with both generated and standard ZIP archives.
+- Edge draft created: `4484bbc2-184b-4249-81ef-f782c5cc6c0c`. Version 2.0.0 package uploaded and verified by Microsoft on 2026-09-14. The store ZIP omits the manifest key, which Edge rejects.
 - Draft dashboard: https://partner.microsoft.com/en-us/dashboard/microsoftedge/4484bbc2-184b-4249-81ef-f782c5cc6c0c/packages
 - No package has been submitted for certification.
+- Privacy disclosures and English description/logo/search terms are saved; the listing is Complete and Publish is available. Submission is held until live deal coverage works.
 
-The preview ZIP intentionally shows Service setup pending. It must not be submitted as a working public extension. Draft preparation can continue before certification.
+The configured ZIP connects to the hosted preview API and preserves the Edge ID when loaded unpacked. It must not be submitted for certification until working live price coverage is verified. The build with no API URL still shows Service setup pending.
 
 ## Partner Center fields
 
@@ -39,11 +43,11 @@ The preview ZIP intentionally shows Service setup pending. It must not be submit
 1. Sign in to Microsoft Partner Center with the publisher's Microsoft account and enroll in the Edge program if needed. The account owner supplies identity/contact information and reviews the developer agreement.
 2. Deploy the API from the GitHub repository using `render.yaml` or `server/Dockerfile`. See `DEPLOYMENT.md`. No paid service should be purchased without a chosen budget.
 3. Build a configured ZIP and create a draft Edge extension. Add its assigned extension ID to `ALLOWED_EXTENSION_IDS` on the API. Replace any temporary development IDs before release.
-4. Set actual `PUBLISHER_NAME`, `SUPPORT_EMAIL (or SUPPORT_URL)`, and `LUMINA_API_URL`; run `npm run extension:store`. The build checks the live health and privacy endpoints.
+4. Set actual `PUBLISHER_NAME`, either `SUPPORT_EMAIL` or `SUPPORT_URL`, and `LUMINA_API_URL`; run `npm run extension:store`. The build checks the live health and privacy endpoints and creates `release/LuminaTracker-edge-store-extension.zip`.
 5. Upload the final ZIP, complete the fields above, verify the live user flow, and submit for certification when the service and listing are ready.
 
 Official references: [free Edge registration](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/create-dev-account), [publish an Edge extension](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension).
 
-## Upload troubleshooting (2026-09-13)
+## Upload troubleshooting (resolved 2026-09-14)
 
-Partner Center returned 'Something went wrong. Please try again.' during package uploads. The latest correlation ID is c254417f-0d31-4044-9f23-4a5f40537d55. No package validation report was returned. A standard Windows ZIP containing the same explicit runtime files also failed; this does not establish a package-format defect. Preserve the existing draft and retry the final configured package after the portal issue is resolved.
+Partner Center initially returned a generic upload error for both generated and standard ZIP archives. Later it returned a validation error for the manifest key field. Store builds now omit that field and use a separate output directory and ZIP; the corrected package was uploaded and verified. The public key remains only in regular unpacked previews to preserve the API-approved ID.

@@ -25,7 +25,7 @@ Publishing target: **Microsoft Edge Add-ons**. See [Edge submission status](stor
 
 Version 2 is standalone: users do not need to install or run the desktop app. It has independent country/consent preferences and calls an online deal API. Automatic shopping-site offers are optional; current page URLs and prices are compared locally.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for hosting, local testing and release steps, and [the store listing draft](store/STORE-LISTING.md) for publication preparation. No public API or store listing has been deployed yet. The generated preview displays Service setup pending until it is rebuilt with an actual HTTPS API URL.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for hosting, local testing and release steps, and [the store listing draft](store/STORE-LISTING.md) for publication preparation. The preview API is deployed at https://luminatracker-api.onrender.com, with a public [privacy page](https://luminatracker-api.onrender.com/privacy). Microsoft verified the Edge package, and the privacy disclosures and English listing are complete. Nothing is published yet: live India and US tests returned zero offers, so a shopping-data provider still needs configuring. The free host can sleep when idle; this is not yet a reliable public service.
 
 ```sh
 npm run api:start

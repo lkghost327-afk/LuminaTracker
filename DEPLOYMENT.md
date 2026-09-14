@@ -2,7 +2,20 @@
 
 Version 2 of the extension requires no desktop application. It sends a product query and country to an online API, then compares the current page's identity and price locally. Current page URLs and prices are not sent to the API. Users choose country and automatic comparisons in the extension itself.
 
-The implementation and deployment files are ready locally. **No public API has been deployed, and no browser-store submission has been made.** The supplied production preview ZIP displays “Service setup pending” until it is rebuilt with your deployed service URL. No hosting account or shopping-provider key has been supplied.
+The preview API is deployed at https://luminatracker-api.onrender.com on Render's free Docker plan in Singapore. Its health and privacy endpoints were verified on 2026-09-14. Publisher: Ashuuuu. Support: https://github.com/lkghost327-afk/LuminaTracker/issues. The API allows the store-issued extension ID `gpebgbfjehhfoincaggfbhcbplfcjgbi`.
+
+**No store release has been published.** Microsoft has verified the version 2.0.0 package, and the privacy disclosures and English listing are saved. The hosted India and US smoke tests returned zero offers because direct retailers blocked or failed the requests; a working shopping-data provider is required before release. No provider key has been supplied. Free Render instances sleep when idle and can exceed the extension's request timeout during cold starts; this is a preview deployment.
+
+To rebuild the configured package in PowerShell:
+
+```powershell
+$env:PUBLISHER_NAME = 'Ashuuuu'
+$env:SUPPORT_URL = 'https://github.com/lkghost327-afk/LuminaTracker/issues'
+$env:LUMINA_API_URL = 'https://luminatracker-api.onrender.com'
+npm run extension:store
+```
+
+The regular preview includes the Edge public key so loading `release/standalone-extension` unpacked uses the same approved ID. No private signing key is included. The store command produces `release/edge-store-extension` and `release/LuminaTracker-edge-store-extension.zip`, omitting the key field because Edge rejects it in uploads. A build with no API URL still produces an explicitly unconfigured preview. Store packaging checks deployment configuration, not retailer availability or certification readiness.
 
 ## Test without Electron
 

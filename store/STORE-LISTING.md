@@ -35,9 +35,9 @@ Declare current shopping-page/product content and browsing activity handled by t
 
 The intended uses are the single-purpose comparison feature and service abuse prevention. Data is not sold or used for unrelated advertising/profiling. Review the generated privacy page against your actual host, shopping provider, logs and retention settings before submitting.
 
-**Privacy URL:** your deployed service's `/privacy` page, with actual publisher and contact details.
+**Privacy URL:** https://luminatracker-api.onrender.com/privacy (publisher: Ashuuuu).
 
-**Support:** your actual support email or HTTPS support page and a working public support URL if required by the store. No invented addresses should be submitted.
+**Support:** https://github.com/lkghost327-afk/LuminaTracker/issues (approved by publisher).
 
 ## Reviewer instructions
 
